@@ -458,3 +458,24 @@ body.admin-area {
     color: #555;
     margin-left: 5px;
 }
+
+/* For laying out form groups side-by-side */
+.form-row-flex {
+    display: flex;
+    gap: 20px; /* Space between form groups */
+    align-items: flex-start; /* Align items to the top if they have different heights */
+}
+
+.form-row-flex .form-group {
+    flex: 1; /* Each form group will take equal width */
+    min-width: 0; /* Allows flex items to shrink below their content size if needed */
+}
+
+/* Responsive adjustment for side-by-side form groups */
+@media (max-width: 768px) {
+    .form-row-flex {
+        flex-direction: column; /* Stack them vertically on smaller screens */
+        gap: 0; /* Reset gap or adjust as needed for stacked layout */
+    }
+    /* .form-row-flex .form-group will naturally take full width when stacked */
+}

@@ -11,6 +11,7 @@ $response = ['success' => false, 'message' => 'Invalid request. Only POST method
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = filter_input(INPUT_POST, 'id', FILTER_VALIDATE_INT);
     $name = trim($_POST['name'] ?? '');
+    $sector_id = filter_input(INPUT_POST, 'sector_id', FILTER_VALIDATE_INT);
 
     if (!$id) {
         $response['message'] = 'Person ID is required for update.';
@@ -22,39 +23,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($response);
         exit;
     }
-    // Basic validation for name length or characters can be added here
-    // Example: if (strlen($name) > 255) { /* error */ }
+    if (empty($sector_id)) {
+        $response['message'] = 'Sector ID is required and must be a valid integer.';
+        echo json_encode($response);
+        exit;
+    }
 
     try {
-        // Optional: Check if another person with the same name already exists (excluding the current person)
-        // This is particularly important if 'name' column has a UNIQUE constraint.
-        // $checkStmt = $pdo->prepare("SELECT id FROM persons WHERE name = :name AND id != :id_current");
-        // $checkStmt->bindParam(':name', $name, PDO::PARAM_STR);
-        // $checkStmt->bindParam(':id_current', $id, PDO::PARAM_INT);
-        // $checkStmt->execute();
-        // if ($checkStmt->fetchColumn()) {
-        //     $response['message'] = 'Another person with this name already exists.';
-        //     echo json_encode($response);
-        //     exit;
-        // }
+        // Check if the provided sector_id actually exists
+        $sectorCheckStmt = $pdo->prepare("SELECT id FROM sectors WHERE id = :sector_id");
+        $sectorCheckStmt->bindParam(':sector_id', $sector_id, PDO::PARAM_INT);
+        $sectorCheckStmt->execute();
+        if (!$sectorCheckStmt->fetchColumn()) {
+            $response['message'] = 'Invalid Sector ID. The selected sector does not exist.';
+            echo json_encode($response);
+            exit;
+        }
 
-        $stmt = $pdo->prepare("UPDATE persons SET name = :name WHERE id = :id");
+        // Optional: Check for duplicate person name if names should be unique
+        // ...
+
+        $stmt = $pdo->prepare("UPDATE persons SET name = :name, sector_id = :sector_id WHERE id = :id");
         $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':sector_id', $sector_id, PDO::PARAM_INT);
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
 
-        $stmt->execute(); // Will throw PDOException on error if ATTR_ERRMODE is set
+        $stmt->execute();
 
-        if ($stmt->rowCount() > 0) {
-            $response['success'] = true;
-            $response['message'] = 'Person updated successfully.';
-        } else {
-            // If rowCount is 0, it could mean the person ID was not found,
-            // or the submitted name was identical to the existing name.
-            // A SELECT query prior to UPDATE could differentiate these cases,
-            // but for simplicity, we'll assume the ID is valid if no exception is thrown.
-            $response['success'] = true; // Query executed without error
-            $response['message'] = 'Person details were unchanged (name might be the same or ID not found if not checked prior).';
-        }
+        // rowCount() can be tricky with UPDATEs if the data is the same as existing.
+        // A more robust check might involve comparing old and new values or just relying on execute() not throwing an error.
+        // For this case, we'll consider it a success if no PDOException was thrown.
+        $response['success'] = true;
+        $response['message'] = 'Person updated successfully.';
+        // if ($stmt->rowCount() > 0) {
+        //     $response['message'] = 'Person updated successfully.';
+        // } else {
+        //     $response['message'] = 'Person details were unchanged or person not found.';
+        // }
 
     } catch (PDOException $e) {
         error_log("Admin Update Person PDO Error (ID: {$id}): " . $e->getMessage());

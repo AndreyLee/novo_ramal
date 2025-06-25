@@ -230,6 +230,7 @@ function initDashboardCharts() {
 // --- Person Management --- //
 function initPersonManagement() {
     const addPersonForm = document.getElementById('add-person-form');
+    const personSectorSelect = document.getElementById('person-sector-id'); // Novo select
     const personsTableBody = document.querySelector('#persons-table tbody');
     const personsTable = document.getElementById('persons-table');
     const personsLoading = document.getElementById('persons-loading');
@@ -240,6 +241,7 @@ function initPersonManagement() {
     const editPersonForm = document.getElementById('edit-person-form');
     const editPersonIdInput = document.getElementById('edit-person-id');
     const editPersonNameInput = document.getElementById('edit-person-name');
+    const editPersonSectorSelect = document.getElementById('edit-person-sector-id'); // Novo select para edição
     const editPersonMessage = document.getElementById('edit-person-message');
 
     const assignExtensionModal = document.getElementById('assign-extension-modal');
@@ -294,7 +296,7 @@ function initPersonManagement() {
         if(!personsTableBody) return;
         personsTableBody.innerHTML = '';
         if (!persons || persons.length === 0) {
-            personsTableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Nenhuma pessoa encontrada.</td></tr>';
+            personsTableBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhuma pessoa encontrada.</td></tr>'; // Colspan atualizado para 5
             return;
         }
         persons.forEach(person => {
@@ -306,11 +308,15 @@ function initPersonManagement() {
             row.innerHTML = `
                 <td>${escapeJSHTML(person.id)}</td>
                 <td>${escapeJSHTML(person.name)}</td>
+                <td>${escapeJSHTML(person.sector_name || 'N/A')}</td>
                 <td data-extension-id="${escapeJSHTML(currentExtId)}">
                     ${escapeJSHTML(currentExtNum)}
                 </td>
                 <td class="actions">
-                    <button class="btn btn-sm btn-warning edit-person-btn" data-id="${person.id}" data-name="${escapeJSHTML(person.name)}">Editar Nome</button>
+                    <button class="btn btn-sm btn-warning edit-person-btn"
+                            data-id="${person.id}"
+                            data-name="${escapeJSHTML(person.name)}"
+                            data-sector-id="${escapeJSHTML(person.sector_id || '')}">Editar</button>
                     <button class="btn btn-sm btn-danger delete-person-btn" data-id="${person.id}" data-name="${escapeJSHTML(person.name)}">Excluir</button>
                     <button class="btn btn-sm btn-info assign-extension-btn"
                             data-person-id="${person.id}"
@@ -353,7 +359,7 @@ function initPersonManagement() {
         personsTableBody.addEventListener('click', function(event) {
             const target = event.target;
             if (target.classList.contains('edit-person-btn')) {
-                openEditPersonModal(target.dataset.id, target.dataset.name);
+                openEditPersonModal(target.dataset.id, target.dataset.name, target.dataset.sectorId);
             } else if (target.classList.contains('delete-person-btn')) {
                 if (confirm(`Tem certeza que deseja excluir "${escapeJSHTML(target.dataset.name)}" (ID: ${target.dataset.id})? Esta ação não pode ser desfeita.`)) {
                     deletePerson(target.dataset.id);
@@ -364,11 +370,40 @@ function initPersonManagement() {
         });
     }
 
-    function openEditPersonModal(id, name) {
-        if (!editPersonModal) return;
+    async function openEditPersonModal(id, name, currentSectorId) {
+        if (!editPersonModal || !editPersonSectorSelect) return;
         editPersonIdInput.value = id;
         editPersonNameInput.value = name;
         if(editPersonMessage) editPersonMessage.style.display = 'none';
+
+        // Popular o select de setores para edição
+        editPersonSectorSelect.innerHTML = '<option value="">Carregando setores...</option>';
+        try {
+            const response = await fetch('/admin/actions/get_sectors_list.php?t=' + new Date().getTime());
+            const result = await response.json();
+            editPersonSectorSelect.innerHTML = '<option value="">-- Selecione um Setor --</option>';
+            if (result.success && result.data) {
+                if (result.data.length > 0) {
+                    result.data.forEach(sector => {
+                        const option = document.createElement('option');
+                        option.value = sector.id;
+                        option.textContent = escapeJSHTML(sector.name);
+                        if (sector.id == currentSectorId) { // Pré-selecionar o setor atual
+                            option.selected = true;
+                        }
+                        editPersonSectorSelect.appendChild(option);
+                    });
+                } else {
+                    editPersonSectorSelect.innerHTML = '<option value="">Nenhum setor cadastrado</option>';
+                }
+            } else {
+                editPersonSectorSelect.innerHTML = `<option value="">Falha ao carregar: ${escapeJSHTML(result.message || 'Erro')}</option>`;
+            }
+        } catch (error) {
+            console.error('Error fetching sectors for edit person modal:', error);
+            editPersonSectorSelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
+        }
+
         editPersonModal.style.display = 'block';
     }
 
@@ -508,6 +543,36 @@ function initPersonManagement() {
                 }
             }
         });
+    }
+
+    async function loadSectorsForPersonForm() {
+        if (!personSectorSelect) return;
+        try {
+            const response = await fetch('/admin/actions/get_sectors_list.php?t=' + new Date().getTime());
+            const result = await response.json();
+            personSectorSelect.innerHTML = '<option value="">-- Selecione um Setor --</option>';
+            if (result.success && result.data) {
+                if (result.data.length > 0) {
+                    result.data.forEach(sector => {
+                        const option = document.createElement('option');
+                        option.value = sector.id;
+                        option.textContent = escapeJSHTML(sector.name);
+                        personSectorSelect.appendChild(option);
+                    });
+                } else {
+                    personSectorSelect.innerHTML = '<option value="">Nenhum setor cadastrado</option>';
+                }
+            } else {
+                personSectorSelect.innerHTML = `<option value="">Falha ao carregar setores: ${escapeJSHTML(result.message || 'Erro')}</option>`;
+            }
+        } catch (error) {
+            console.error('Error fetching sectors for person form:', error);
+            personSectorSelect.innerHTML = '<option value="">Erro ao carregar setores</option>';
+        }
+    }
+
+    if(addPersonForm && personSectorSelect) { // Garante que o select existe antes de tentar popular
+        loadSectorsForPersonForm();
     }
 
     if(personsTableBody) fetchPersons();

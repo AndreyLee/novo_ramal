@@ -10,38 +10,36 @@ $response = ['success' => false, 'message' => 'Invalid request. Only POST method
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name'] ?? '');
+    $sector_id = filter_input(INPUT_POST, 'sector_id', FILTER_VALIDATE_INT);
 
     if (empty($name)) {
         $response['message'] = 'Person name cannot be empty.';
         echo json_encode($response);
         exit;
     }
-
-    // Basic validation for name length or characters can be added here if desired
-    // Example: if (strlen($name) > 255) { /* error */ }
+    if (empty($sector_id)) { // sector_id is now required
+        $response['message'] = 'Sector ID is required and must be a valid integer.';
+        echo json_encode($response);
+        exit;
+    }
 
     try {
-        // It's good practice to check if a person with the same name already exists
-        // if the 'name' column in 'persons' table is meant to be unique.
-        // Assuming 'name' in 'persons' does NOT have a UNIQUE constraint for this example,
-        // as the original schema didn't specify one. If it does, the duplicate check below or
-        // relying on PDO exception (1062) for unique constraint violation is appropriate.
-
-        /*
-        // Optional: Explicit check for duplicate name if 'name' is unique and you want a custom message before insert attempt
-        $checkStmt = $pdo->prepare("SELECT id FROM persons WHERE name = :name");
-        $checkStmt->bindParam(':name', $name, PDO::PARAM_STR);
-        $checkStmt->execute();
-        if ($checkStmt->fetchColumn()) {
-            $response['message'] = 'A person with this name already exists.';
-            $response['success'] = false; // Explicitly set success to false
+        // Check if the provided sector_id actually exists
+        $sectorCheckStmt = $pdo->prepare("SELECT id FROM sectors WHERE id = :sector_id");
+        $sectorCheckStmt->bindParam(':sector_id', $sector_id, PDO::PARAM_INT);
+        $sectorCheckStmt->execute();
+        if (!$sectorCheckStmt->fetchColumn()) {
+            $response['message'] = 'Invalid Sector ID. The selected sector does not exist.';
             echo json_encode($response);
             exit;
         }
-        */
 
-        $stmt = $pdo->prepare("INSERT INTO persons (name) VALUES (:name)");
+        // Optional: Check for duplicate person name if names should be unique (not specified in current schema for persons.name)
+        // ...
+
+        $stmt = $pdo->prepare("INSERT INTO persons (name, sector_id) VALUES (:name, :sector_id)");
         $stmt->bindParam(':name', $name, PDO::PARAM_STR);
+        $stmt->bindParam(':sector_id', $sector_id, PDO::PARAM_INT);
 
         if ($stmt->execute()) {
             $response['success'] = true;

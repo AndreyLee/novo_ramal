@@ -11,9 +11,18 @@ require_once __DIR__ . '/../src/includes/header_admin.php';
 <div class="admin-card">
     <h3>Adicionar Nova Pessoa</h3>
     <form id="add-person-form" class="admin-form">
-        <div class="form-group">
-            <label for="person-name">Nome da Pessoa:</label>
-            <input type="text" id="person-name" name="name" class="form-control" required placeholder="Ex: João Silva">
+        <div class="form-row-flex">
+            <div class="form-group">
+                <label for="person-name">Nome:</label>
+                <input type="text" id="person-name" name="name" class="form-control" required placeholder="Ex: João Silva">
+            </div>
+            <div class="form-group">
+                <label for="person-sector-id">Setor:</label>
+                <select id="person-sector-id" name="sector_id" class="form-control" required>
+                    <option value="">Carregando setores...</option>
+                    <!-- Options for sectors will be populated by JS -->
+                </select>
+            </div>
         </div>
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Adicionar Pessoa</button>
@@ -33,6 +42,7 @@ require_once __DIR__ . '/../src/includes/header_admin.php';
                 <tr>
                     <th>ID</th>
                     <th>Nome</th>
+                    <th>Setor</th>
                     <th>Ramal Atribuído</th>
                     <th class="actions">Ações</th>
                 </tr>
@@ -51,9 +61,18 @@ require_once __DIR__ . '/../src/includes/header_admin.php';
         <h3>Editar Pessoa</h3>
         <form id="edit-person-form" class="admin-form">
             <input type="hidden" id="edit-person-id" name="id">
-            <div class="form-group">
-                <label for="edit-person-name">Nome:</label>
-                <input type="text" id="edit-person-name" name="name" class="form-control" required>
+            <div class="form-row-flex">
+                <div class="form-group">
+                    <label for="edit-person-name">Nome:</label>
+                    <input type="text" id="edit-person-name" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit-person-sector-id">Setor:</label>
+                    <select id="edit-person-sector-id" name="sector_id" class="form-control" required>
+                        <option value="">Carregando setores...</option>
+                        <!-- Options for sectors will be populated by JS -->
+                    </select>
+                </div>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Salvar Alterações</button>

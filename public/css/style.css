@@ -340,3 +340,109 @@ body {
     }
     /* Further reduce font sizes in accordion if needed */
 }
+
+/* New Styles for Sector Grid Layout on Public Index Page */
+.sectors-grid-container {
+    display: grid;
+    /* Cria colunas responsivas: no máximo 5, mínimo 1.
+       Cada coluna tenta ter pelo menos 200px, mas pode crescer para preencher o espaço.
+    */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding-top: 20px;
+}
+
+/* Ajuste para garantir no máximo 5 colunas em telas grandes */
+@media (min-width: 1500px) { /* Ajuste este breakpoint conforme necessário */
+    .sectors-grid-container {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+@media (max-width: 1499px) and (min-width: 1200px) {
+    .sectors-grid-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+@media (max-width: 1199px) and (min-width: 992px) {
+    .sectors-grid-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 991px) and (min-width: 768px) {
+    .sectors-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (max-width: 767px) {
+    .sectors-grid-container {
+        grid-template-columns: 1fr; /* Uma coluna em telas pequenas */
+    }
+}
+
+
+.sector-table-wrapper { /* Renomeado de .sector-column para mais clareza */
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 15px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    display: flex; /* Para que a tabela não exceda a altura se o conteúdo for muito grande */
+    flex-direction: column;
+}
+
+.sector-table-wrapper h4 { /* Era h3, mudei para h4 para consistência se h2 for título da seção */
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.2em; /* Ajustado */
+    color: #0056b3;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #d0d0d0;
+    text-align: center;
+}
+
+.sector-extension-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+}
+
+.sector-extension-table th,
+.sector-extension-table td {
+    text-align: left;
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.sector-extension-table th {
+    background-color: #e9ecef;
+    font-weight: bold;
+    color: #333;
+}
+
+.sector-extension-table td:last-child { /* Coluna do ramal */
+    text-align: right;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.sector-extension-table tr:last-child td {
+    border-bottom: none;
+}
+
+.sector-table-wrapper .no-members { /* Estilo para a mensagem "Nenhum membro..." */
+    text-align: center;
+    padding: 10px;
+    font-style: italic;
+    color: #777;
+}
+
+
+.error-message { /* General error message styling, if not already defined */
+    color: #D8000C;
+    background-color: #FFD2D2;
+    border: 1px solid #D8000C;
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    text-align: center;
+}

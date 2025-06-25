@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip && \
-    docker-php-ext-install -j$(nproc) pdo pdo_mysql mysqli mbstring xml intl zip
+    unzip \
+    && docker-php-ext-install -j$(nproc) pdo pdo_mysql mysqli mbstring xml intl zip
 
 # Enable Apache rewrite module
 RUN a2enmod rewrite

@@ -28,7 +28,8 @@ $profile = isset($_SESSION['user_profile']) ? htmlspecialchars($_SESSION['user_p
     </header>
     <nav class="admin-main-nav">
         <ul>
-            <li><a href="/admin/index.php" class="<?php echo $current_page == 'index.php' ? 'active' : ''; ?>">Dashboard</a></li>
+            <li><a href="/" class="<?php echo $current_page == 'index.php' && strpos($_SERVER['REQUEST_URI'], '/admin/') === false ? 'active' : ''; ?>">Página Pública</a></li>
+            <li><a href="/admin/index.php" class="<?php echo $current_page == 'index.php' && strpos($_SERVER['REQUEST_URI'], '/admin/') !== false ? 'active' : ''; ?>">Dashboard</a></li>
             <!-- Placeholder links - actual pages need to be created -->
             <li><a href="/admin/manage_persons.php" class="<?php echo $current_page == 'manage_persons.php' ? 'active' : ''; ?>">Pessoas</a></li>
             <?php if ($profile === 'Super-Admin'): ?>

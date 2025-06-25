@@ -15,9 +15,12 @@ try {
         SELECT
             p.id,
             p.name,
+            p.sector_id,
+            s.name AS sector_name,
             e.id AS assigned_extension_id,
             e.number AS assigned_extension_number
         FROM persons p
+        JOIN sectors s ON p.sector_id = s.id
         LEFT JOIN extensions e ON p.id = e.person_id AND e.status = 'Atribuído'
         ORDER BY p.name ASC
     ";
