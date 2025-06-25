@@ -29,13 +29,13 @@ $profile = isset($_SESSION['user_profile']) ? htmlspecialchars($_SESSION['user_p
     <nav class="admin-main-nav">
         <ul>
             <li><a href="/admin/index.php" class="<?php echo $current_page == 'index.php' ? 'active' : ''; ?>">Dashboard</a></li>
-            <!-- Placeholder links - actual pages need to be created -->
             <li><a href="/admin/manage_persons.php" class="<?php echo $current_page == 'manage_persons.php' ? 'active' : ''; ?>">Pessoas</a></li>
             <?php if ($profile === 'Super-Admin'): ?>
                 <li><a href="/admin/manage_extensions.php" class="<?php echo $current_page == 'manage_extensions.php' ? 'active' : ''; ?>">Ramais</a></li>
                 <li><a href="/admin/manage_sectors.php" class="<?php echo $current_page == 'manage_sectors.php' ? 'active' : ''; ?>">Setores</a></li>
                 <li><a href="/admin/manage_users.php" class="<?php echo $current_page == 'manage_users.php' ? 'active' : ''; ?>">Usuários</a></li>
             <?php endif; ?>
+            <li><a href="/admin/change_password.php" class="<?php echo $current_page == 'change_password.php' ? 'active' : ''; ?>">Alterar Minha Senha</a></li>
         </ul>
     </nav>
     <main class="admin-container">
