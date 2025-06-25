@@ -6,13 +6,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingMessage = document.getElementById('loading-message');
     const errorMessageDiv = document.getElementById('error-message');
 
-    let allSectorsData = []; // To store sectors for search fallback
+    // let allSectorsData = []; // Potentially keep for search fallback if search is not table-based
 
     function displayError(message) {
         errorMessageDiv.textContent = message;
         errorMessageDiv.style.display = 'block';
         if (loadingMessage) loadingMessage.style.display = 'none';
-        extensionListArea.innerHTML = ''; // Clear previous content if error occurs
+        extensionListArea.innerHTML = `<p class="error-message">${escapeHTML(message)}</p>`; // Clear previous content and show error
     }
 
     function showLoading(show = true) {
@@ -23,142 +23,110 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function fetchSectors() {
+    async function fetchAndRenderDashboardTables() {
         showLoading(true);
         try {
-            const response = await fetch('/ajax/get_sectors.php');
+            const response = await fetch('/ajax/get_dashboard_data.php');
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const result = await response.json();
             showLoading(false);
-
-            if (result.success && result.data) { // Check result.data as well
-                allSectorsData = result.data;
-                if (allSectorsData.length > 0) {
-                    renderSectors(allSectorsData);
-                } else {
-                     extensionListArea.innerHTML = '<p>Nenhum setor cadastrado no momento.</p>';
-                }
-            } else {
-                displayError(result.message || 'Falha ao carregar setores. A resposta do servidor não foi bem-sucedida.');
-            }
-        } catch (error) {
-            console.error('Error fetching sectors:', error);
-            showLoading(false);
-            displayError('Erro de conexão ao tentar carregar os setores. Verifique sua internet ou tente mais tarde.');
-        }
-    }
-
-    function renderSectors(sectors) {
-        extensionListArea.innerHTML = ''; // Clear previous content or loading message
-        errorMessageDiv.style.display = 'none'; // Clear error messages
-        sectors.forEach(sector => {
-            const accordionItem = document.createElement('div');
-            accordionItem.classList.add('accordion-item');
-            accordionItem.innerHTML = `
-                <div class="accordion-header" data-sector-id="${sector.id}">
-                    <span>${escapeHTML(sector.name)}</span>
-                    <span class="arrow">&#9654;</span> <!-- Right pointing triangle -->
-                </div>
-                <div class="accordion-content">
-                    <div class="loading-extensions" style="padding:15px 20px;">Carregando ramais do setor...</div>
-                </div>
-            `;
-            extensionListArea.appendChild(accordionItem);
-        });
-    }
-
-    async function fetchExtensionsForSector(sectorId, contentDiv) {
-        try {
-            const response = await fetch(`/ajax/get_extensions_by_sector.php?sector_id=${sectorId}`);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const result = await response.json();
 
             if (result.success && result.data) {
                 if (result.data.length > 0) {
-                    const ul = document.createElement('ul');
-                    result.data.forEach(ext => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `<span class="name">${escapeHTML(ext.person_name)}</span> <span class="extension">${escapeHTML(ext.extension_number)}</span>`;
-                        ul.appendChild(li);
-                    });
-                    contentDiv.innerHTML = ''; // Clear loading message
-                    contentDiv.appendChild(ul);
+                    renderDashboardTables(result.data);
                 } else {
-                    contentDiv.innerHTML = '<p class="no-extensions">Nenhum ramal atribuído neste setor.</p>';
+                    extensionListArea.innerHTML = `<p>${escapeHTML(result.message) || 'Nenhum setor para exibir no momento.'}</p>`;
                 }
             } else {
-                 contentDiv.innerHTML = `<p class="no-extensions">${escapeHTML(result.message) || 'Falha ao carregar ramais para este setor.'}</p>`;
+                displayError(result.message || 'Falha ao carregar dados do dashboard.');
             }
         } catch (error) {
-            console.error('Error fetching extensions for sector:', error);
-            contentDiv.innerHTML = '<p class="no-extensions">Erro ao carregar ramais. Tente novamente.</p>';
+            console.error('Error fetching dashboard data:', error);
+            showLoading(false);
+            displayError('Erro de conexão ao tentar carregar os dados. Verifique sua internet ou tente mais tarde.');
         }
     }
 
-    extensionListArea.addEventListener('click', function(event) {
-        const header = event.target.closest('.accordion-header');
-        if (header) {
-            const item = header.parentElement;
-            const content = item.querySelector('.accordion-content');
-            const sectorId = header.dataset.sectorId;
+    function renderDashboardTables(sectorsData) {
+        extensionListArea.innerHTML = ''; // Clear previous content or loading message
+        errorMessageDiv.style.display = 'none'; // Clear error messages
 
-            // Do not toggle if the click was on something that is not the header itself (e.g. if header had buttons)
-            if (!event.target.matches('.accordion-header') && !event.target.parentElement.matches('.accordion-header')) {
-                return;
-            }
+        sectorsData.forEach(sector => {
+            const sectorContainer = document.createElement('div');
+            sectorContainer.classList.add('sector-table-container'); // For styling
 
-            item.classList.toggle('active');
-            if (item.classList.contains('active')) {
-                content.style.display = 'block';
-                header.querySelector('.arrow').innerHTML = '&#9660;'; // Down arrow
-                // Fetch extensions only if content hasn't been loaded yet
-                if (!content.dataset.loaded) {
-                    fetchExtensionsForSector(sectorId, content);
-                    content.dataset.loaded = 'true';
-                }
+            const title = document.createElement('h3'); // Or h4
+            title.classList.add('sector-title');
+            title.textContent = escapeHTML(sector.sector_name);
+            sectorContainer.appendChild(title);
+
+            if (sector.extensions && sector.extensions.length > 0) {
+                const table = document.createElement('table');
+                table.classList.add('extension-table'); // For styling
+
+                const thead = table.createTHead();
+                const headerRow = thead.insertRow();
+                const thPerson = document.createElement('th');
+                thPerson.textContent = 'Pessoa';
+                headerRow.appendChild(thPerson);
+                const thExtension = document.createElement('th');
+                thExtension.textContent = 'Ramal';
+                headerRow.appendChild(thExtension);
+
+                const tbody = table.createTBody();
+                sector.extensions.forEach(ext => {
+                    const row = tbody.insertRow();
+                    const cellPerson = row.insertCell();
+                    cellPerson.textContent = escapeHTML(ext.person_name);
+                    const cellExtension = row.insertCell();
+                    cellExtension.textContent = escapeHTML(ext.extension_number);
+                });
+                sectorContainer.appendChild(table);
             } else {
-                content.style.display = 'none';
-                header.querySelector('.arrow').innerHTML = '&#9654;'; // Right arrow
+                const noExtensionsMessage = document.createElement('p');
+                noExtensionsMessage.classList.add('no-extensions-message');
+                noExtensionsMessage.textContent = 'Nenhum ramal atribuído neste setor.';
+                sectorContainer.appendChild(noExtensionsMessage);
             }
-        }
-    });
+            extensionListArea.appendChild(sectorContainer);
+        });
+    }
+
+    // Comment out or remove original accordion logic if tables replace it completely on initial load
+    /*
+    async function fetchSectors() { ... }
+    function renderSectors(sectors) { ... }
+    async function fetchExtensionsForSector(sectorId, contentDiv) { ... }
+    extensionListArea.addEventListener('click', function(event) { ... accordion logic ... });
+    */
 
     let searchTimeout = null;
     searchInput.addEventListener('input', function() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             performSearch(searchInput.value.trim());
-        }, 300); // Debounce search: wait 300ms after user stops typing
+        }, 300);
     });
 
     clearSearchBtn.addEventListener('click', function() {
         searchInput.value = '';
-        errorMessageDiv.style.display = 'none'; // Clear any previous search error
-        if (allSectorsData.length > 0) {
-            renderSectors(allSectorsData); // Re-render all sectors
-        } else {
-            fetchSectors(); // Or fetch if initial load failed or was empty
-        }
+        errorMessageDiv.style.display = 'none';
+        fetchAndRenderDashboardTables(); // Reload dashboard tables
     });
 
     async function performSearch(term) {
+        // If search term is empty, restore dashboard tables
         if (!term) {
-            // If search term is empty, show all sectors (collapsed)
-            errorMessageDiv.style.display = 'none';
-            if (allSectorsData.length > 0) {
-                renderSectors(allSectorsData);
-            } else {
-                fetchSectors(); // Fetch if not already loaded
-            }
+            fetchAndRenderDashboardTables();
             return;
         }
 
         showLoading(true);
         try {
+            // Assuming search_extensions.php returns data in a suitable format for renderSearchResults
+            // or renderSearchResults might need adjustment if search results format changes.
             const response = await fetch(`/ajax/search_extensions.php?term=${encodeURIComponent(term)}`);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -169,10 +137,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (result.success && result.data) {
                 renderSearchResults(result.data, term);
             } else {
-                 // Prefer message from server if available and meaningful
                 const message = result.message || `Nenhum resultado encontrado para "${escapeHTML(term)}".`;
-                displayError(message); // Use displayError to show this message where extensionListArea is
-                extensionListArea.innerHTML = `<p>${escapeHTML(message)}</p>`; // Also put it in the list area
+                // Display error within the list area itself for search
+                extensionListArea.innerHTML = `<p>${escapeHTML(message)}</p>`;
+                errorMessageDiv.style.display = 'none'; // Hide the global error div if showing message in list
             }
         } catch (error) {
             console.error('Search error:', error);
@@ -183,14 +151,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function renderSearchResults(results, term) {
         extensionListArea.innerHTML = ''; // Clear previous list or loading message
-        errorMessageDiv.style.display = 'none'; // Clear error messages
+        errorMessageDiv.style.display = 'none';
 
         if (results.length === 0) {
             extensionListArea.innerHTML = `<p>Nenhum resultado encontrado para "<strong>${escapeHTML(term)}</strong>".</p>`;
             return;
         }
 
-        // Group results by sector for better readability
+        // Current search result rendering (groups by sector, uses ul/li)
+        // This might need to be adapted if the desired search result display is also tables.
+        // For now, keeping the existing search result structure.
         const groupedResults = results.reduce((acc, item) => {
             const sector = item.sector_name || 'Setor não especificado';
             if (!acc[sector]) {
@@ -203,9 +173,11 @@ document.addEventListener('DOMContentLoaded', function() {
         let htmlContent = `<h3>Resultados da busca por "${escapeHTML(term)}":</h3>`;
 
         for (const sectorName in groupedResults) {
-            htmlContent += `<div class="accordion-item search-result-sector">`;
-            htmlContent += `<div class="accordion-header static"><span>${escapeHTML(sectorName)}</span></div>`; // Static, not clickable for now
-            htmlContent += `<div class="accordion-content" style="display: block;"><ul>`; // Display content directly for search
+            // Using a simpler div structure for search results instead of full tables for now
+            // to distinguish from the main dashboard view.
+            htmlContent += `<div class="search-result-sector-group">`;
+            htmlContent += `<h4>${escapeHTML(sectorName)}</h4>`;
+            htmlContent += `<ul class="search-result-list">`;
 
             groupedResults[sectorName].forEach(item => {
                 htmlContent += `
@@ -214,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="extension">${escapeHTML(item.extension_number)}</span>
                     </li>`;
             });
-            htmlContent += `</ul></div></div>`;
+            htmlContent += `</ul></div>`;
         }
         extensionListArea.innerHTML = htmlContent;
     }
@@ -232,6 +204,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initial load of all sectors
-    fetchSectors();
+    // Initial load: fetch and render dashboard tables
+    fetchAndRenderDashboardTables();
 });
