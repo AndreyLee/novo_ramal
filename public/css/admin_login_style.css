@@ -1,0 +1,99 @@
+/* public/css/admin_login_style.css */
+body.admin-login-page {
+    display: flex;
+    flex-direction: column; /* Ensure footer can be pushed down */
+    justify-content: center; /* Center login box vertically */
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f0f2f5; /* Slightly different background for admin area */
+    margin: 0;
+    font-family: Arial, sans-serif; /* Ensure font is set if style.css is minimal */
+}
+
+.login-container {
+    background-color: #fff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 400px;
+    text-align: center; /* Center heading and form elements if not full width */
+}
+
+.login-container h2 {
+    color: #333;
+    margin-bottom: 25px;
+    font-size: 1.8em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: bold;
+}
+
+/* .form-control is expected to be in style.css or defined here */
+/* Ensuring it's defined for this page specifically if not fully covered by global */
+.login-container .form-control {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+.btn-block { /* From style.css, can be specific here if needed */
+    width: 100%;
+    padding-top: 12px;
+    padding-bottom: 12px;
+    font-size: 1.1em;
+}
+
+/* .message, .error-message, .info-message are expected from style.css or defined here */
+/* Ensuring specific styling for login page messages */
+.login-container .message {
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 0.95em;
+    text-align: center;
+}
+.login-container .error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.login-container .info-message {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.login-container .back-to-site {
+    margin-top: 20px;
+    font-size: 0.9em;
+}
+.login-container .back-to-site a {
+    color: #007bff;
+    text-decoration: none;
+}
+.login-container .back-to-site a:hover {
+    text-decoration: underline;
+}
+
+.login-footer {
+    margin-top: auto; /* Pushes footer to bottom */
+    width: 100%;
+    background-color: transparent; /* Or a subtle color */
+    color: #666; /* Muted color for login footer */
+    text-align: center;
+    padding: 20px 0;
+    font-size: 0.9em;
+}

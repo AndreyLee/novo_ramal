@@ -1,0 +1,342 @@
+/* General Resets and Body Styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f7f6;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    flex-grow: 1; /* Ensures container takes up available space, pushing footer down */
+}
+
+/* Header Styling */
+.main-header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 5%; /* Use percentage for responsive padding */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.main-header nav .nav-link {
+    color: white;
+    text-decoration: none;
+    font-size: 1em;
+    padding: 8px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.main-header nav .nav-link:hover {
+    background-color: #0056b3;
+}
+
+/* Footer Styling */
+.main-footer {
+    text-align: center;
+    padding: 20px;
+    margin-top: auto; /* Pushes footer to bottom if content is short */
+    background-color: #343a40;
+    color: white;
+    font-size: 0.9em;
+}
+
+/* General Button Styling */
+.btn {
+    padding: 10px 15px;
+    min-width: 80px; /* Minimum width */
+    height: auto; /* Auto height based on padding and content */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, background-color 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.btn:hover {
+    transform: scale(1.05); /* Subtle increase */
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.15); /* Slightly larger shadow for depth */
+}
+
+.btn:active {
+    transform: scale(0.98); /* Subtle press effect */
+}
+
+/* Specific Button Colors (Examples) */
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+.btn-primary:hover {
+    background-color: #0069d9;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: #212529; /* Dark text for light background */
+}
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+.btn-success:hover {
+    background-color: #218838;
+}
+
+/* Add more button types as needed */
+
+/* Search Container */
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.search-container .form-control {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+/* Accordion Styling */
+.accordion-container {
+    margin-top: 20px;
+}
+
+.accordion-item {
+    background-color: #fff;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    border: 1px solid #e0e0e0;
+}
+
+.accordion-header {
+    background-color: #e9ecef;
+    color: #333;
+    padding: 15px 20px;
+    cursor: pointer;
+    border-bottom: 1px solid #d0d0d0;
+    border-radius: 5px 5px 0 0; /* Rounded top corners */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+
+.accordion-header:hover {
+    background-color: #d8dfe5;
+}
+
+.accordion-header .arrow {
+    transition: transform 0.3s ease;
+    font-size: 1.2em;
+}
+
+.accordion-item.active .accordion-header .arrow {
+    transform: rotate(90deg);
+}
+
+
+.accordion-content {
+    padding: 0; /* Remove padding, list items will have their own */
+    display: none; /* Collapsed by default */
+    border-top: 1px solid #e0e0e0;
+    background-color: #fdfdfd;
+}
+.accordion-content ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.accordion-content ul li {
+    padding: 12px 20px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+.accordion-content ul li:last-child {
+    border-bottom: none;
+}
+.accordion-content ul li .name {
+    font-weight: normal;
+    color: #333;
+}
+.accordion-content ul li .extension {
+    font-weight: bold;
+    color: #0056b3;
+}
+
+.accordion-content .no-extensions {
+    padding: 15px 20px;
+    color: #777;
+    font-style: italic;
+}
+
+/* Search Results Styling (simple version) */
+#search-results-area { /* This ID is not used in the final JS, extension-list-area is reused */
+    margin-top: 20px;
+}
+#search-results-area h3 { /* This ID is not used in the final JS */
+    margin-bottom: 10px;
+}
+/* Styling for search results if they are directly put into extension-list-area */
+#extension-list-area h3 { /* If a title is added for search results */
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    color: #333;
+}
+#extension-list-area ul { /* General list styling for search results if ul is used */
+    list-style: none;
+    padding: 0;
+}
+#extension-list-area ul li { /* General list item styling for search results */
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex; /* Using flex for search results too */
+    justify-content: space-between;
+    align-items: center;
+}
+#extension-list-area ul li:last-child {
+    border-bottom: none;
+}
+#extension-list-area ul li .name { /* Reusing classes from accordion for consistency */
+    font-weight: normal;
+    color: #333;
+}
+#extension-list-area ul li .extension { /* Reusing classes from accordion */
+    font-weight: bold;
+    color: #0056b3;
+}
+#extension-list-area ul li .sector-name { /* Specific to search results */
+    font-size: 0.85em;
+    color: #555;
+    margin-left: 10px;
+    background-color: #f0f0f0;
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Responsive Design Adjustments */
+@media (max-width: 768px) { /* Tablet and smaller */
+    .main-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 3%;
+    }
+    .main-header h1 {
+        margin-bottom: 10px;
+        font-size: 1.5em;
+    }
+    .main-header nav .nav-link {
+        display: block; /* Make nav link take full width if needed or adjust padding */
+        margin-top: 5px;
+        padding: 8px 10px;
+    }
+
+    .container {
+        width: 95%;
+        padding: 15px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .search-container {
+        flex-direction: column;
+        align-items: stretch; /* Make children take full width */
+    }
+    .search-container .form-control {
+        margin-bottom: 10px; /* Space when stacked */
+    }
+    .search-container .btn {
+        width: 100%; /* Full width button */
+    }
+
+    .accordion-header {
+        padding: 12px 15px;
+        font-size: 0.95em;
+    }
+    .accordion-content ul li {
+        padding: 10px 15px;
+        font-size: 0.9em;
+        flex-direction: column; /* Stack name and extension on small screens */
+        align-items: flex-start;
+    }
+    .accordion-content ul li .extension {
+        margin-top: 3px;
+        margin-left: 0; /* Reset margin if any */
+    }
+
+    #extension-list-area ul li { /* Adjusted from #search-results-area as ID is reused */
+        flex-direction: column;
+        align-items: flex-start;
+    }
+     #extension-list-area ul li .sector-name { /* Adjusted from #search-results-area */
+        margin-left: 0;
+        margin-top: 3px;
+    }
+
+    .btn { /* Ensure buttons are tappable */
+        padding: 12px 18px;
+    }
+}
+
+@media (max-width: 480px) { /* Mobile phones */
+    .main-header h1 {
+        font-size: 1.3em;
+    }
+    .main-header nav .nav-link {
+        font-size: 0.9em;
+    }
+    .container {
+        padding: 10px;
+    }
+    /* Further reduce font sizes in accordion if needed */
+}
